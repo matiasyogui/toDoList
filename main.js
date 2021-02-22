@@ -1,9 +1,32 @@
 const $aceptar = document.querySelector('#aceptar');
 const $input = document.querySelector('input');
 
+if(!localStorage.getItem('tasks')){
+    localStorage.setItem('tasks', 0);
+}
+
+let arrLocalStorage;
+
+if(JSON.parse(localStorage.getItem('tasks') != 0)){
+    arrLocalStorage = JSON.parse(localStorage.getItem('tasks'));
+}else{
+    arrLocalStorage = [];
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log(arrLocalStorage);
+
+    if(arrLocalStorage != 0){
+        arrLocalStorage.forEach(task => {
+            agregarALista(task[0]);
+        });
+    }
+});
+
 $aceptar.addEventListener('click', () => {
     const texto = $input.value;
     agregarALista(texto);
+    crearTask(texto);
     borrarInput();
 });
 
@@ -15,8 +38,6 @@ function agregarALista(texto) {
     if(texto == ''){
         return;
     }
-
-    console.log('Se agrego a la lista ' + texto);
 
     const $items = document.querySelector('#items');
 
@@ -46,8 +67,26 @@ function agregarALista(texto) {
     $item.appendChild($eliminar);
 
     $items.appendChild($item);
+    
+    console.log('Se agrego a la lista ' + texto);
 }
 
+function crearTask(texto){
+    let task = [];
+    task.push(texto);
+    task.push(false);
+
+    arrLocalStorage.push(task);
+
+    guardarLocalStorage(arrLocalStorage);
+
+    console.log(arrLocalStorage);
+    console.log(task);
+}
+
+function guardarLocalStorage(arr){
+    localStorage.setItem('tasks', JSON.stringify(arr))
+}
 
 document.addEventListener('click', e => {
     if(e.target.matches('#item-check')){
@@ -85,6 +124,8 @@ document.querySelector('#reset').addEventListener('mouseup', () => {
         items[i].remove();
         console.log('Se elimino ' + items[i].textContent);
     }
+
+    localStorage.setItem('tasks', 0);
 
     document.querySelector('#items').className = 'oculto';
 });
