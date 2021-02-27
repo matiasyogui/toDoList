@@ -4,7 +4,6 @@ const $input = document.querySelector('input');
 let arrLocalStorage;
 
 //-------------------FUNCIONES------------
-
 function habilitarBoton() {
     $aceptar.disabled = false;
 }
@@ -16,7 +15,6 @@ function desabilitarBoton() {
 function borrarInput() {
     $input.value = '';
 }
-
 
 function agregarALista(texto, tachado) {
 
@@ -66,19 +64,36 @@ function crearTask(texto){
 
     arrLocalStorage.push(task);
 
-    guardarLocalStorage(arrLocalStorage);
+    guardarLocalStorage('tasks', arrLocalStorage);
 
     console.log(arrLocalStorage);
     console.log(task);
 }
 
-function guardarLocalStorage(arr){
-    localStorage.setItem('tasks', JSON.stringify(arr))
+function sacarDeLocalStorage(key){
+    return JSON.parse(localStorage.getItem(key));
 }
 
+function guardarLocalStorage(key, value){
+    console.log('Se guardo en LS ' + value);
+    localStorage.setItem(key, JSON.stringify(value))
+}
+
+function buscaYEliminaDeLocalStorage(text) {
+    let arrTasks = sacarDeLocalStorage('tasks');
+
+    for(let i = 0; i < arrTasks.length; i++){
+        if(arrTasks[i][0] == text.textContent){
+            console.log('Entre a ' + arrTasks[i]);
+            arrTasks.splice(i, 1);
+        }
+    }
+
+    console.log(arrTasks);
+    guardarLocalStorage('tasks', arrTasks);
+}
 
 //-------------------EVENT LISTENERS------------
-
 document.addEventListener('DOMContentLoaded', () => { //DOMContentLoaded, cuando se carga el html
     if(!localStorage.getItem('tasks')){
         localStorage.setItem('tasks', 0);
@@ -127,7 +142,7 @@ document.addEventListener('click', e => { //CHECKBOX | BOTON ELIMINAR
     
         let parrafo = e.target.nextElementSibling;
         console.log(parrafo);
-        let arrTasks = JSON.parse(localStorage.getItem('tasks'));
+        let arrTasks = sacarDeLocalStorage('tasks');
 
         for(let i = 0; i < arrTasks.length; i++){
             if(arrTasks[i][0] == parrafo.textContent){
@@ -144,20 +159,24 @@ document.addEventListener('click', e => { //CHECKBOX | BOTON ELIMINAR
                 }
             }
         }
-        guardarLocalStorage(arrTasks);
+        guardarLocalStorage('tasks', arrTasks);
         console.log(e);
     }
 
     if(e.target.matches("#eliminar")){ //ELIMINAR
-        e.target.parentElement.remove();
+        const taskDiv = e.target.parentElement;
+        taskDiv.remove();
+        textRemoved = taskDiv.querySelector('p');
+
         console.log(document.querySelector('#items').children);
+
+        buscaYEliminaDeLocalStorage(textRemoved);
 
         if(document.querySelector('#items').children.length == 0){
             document.querySelector('#items').className = 'oculto';
         }
     }
 });
-
 
 $input.addEventListener('input', (e) => { //INPUT, HABILITAR | DESABILITAR BOTON ACEPTAR
     if(e.target.value == ''){
