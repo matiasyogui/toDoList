@@ -3,4 +3,5 @@ to do list simple y fea
 
 TODO (ironico)
 - [ ] Hacerla mas linda.
-- [ ] Jugar con local storage.
+- [x] Jugar con local storage.
+- [ ] Hacer que se queden los tachados las tasks
